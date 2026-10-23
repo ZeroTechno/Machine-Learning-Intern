@@ -7,6 +7,7 @@
     <style>
         :root {
             --primary: #2563eb;
+            --primary-dark: #1d4ed8;
             --text: #1f2937;
             --bg: #f8fafc;
             --card: #ffffff;
@@ -21,26 +22,32 @@
             padding: 40px 20px;
         }
         .container {
-            max-width: 900px;
+            max-width: 920px;
             margin: 0 auto;
             background: var(--card);
-            padding: 40px;
+            padding: 48px;
             border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
             border: 1px solid var(--border);
         }
-        h1 { color: #1e293b; font-size: 2.2rem; margin-bottom: 0.5rem; }
-        h2 { color: var(--primary); font-size: 1.4rem; margin-top: 2rem; border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; }
-        .meta { color: #64748b; font-size: 0.95rem; margin-bottom: 2rem; }
-        .abstract { background: #eff6ff; border-left: 4px solid var(--primary); padding: 20px; margin: 20px 0; border-radius: 0 8px 8px 0; }
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        th, td { padding: 12px; border: 1px solid var(--border); text-align: left; }
-        th { background: #f1f5f9; }
-        code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
-        a { color: var(--primary); text-decoration: none; }
+        h1 { color: #0f172a; font-size: 2.25rem; margin-bottom: 0.5rem; line-height: 1.25; }
+        h2 { color: var(--primary); font-size: 1.4rem; margin-top: 2.25rem; border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; }
+        .meta { color: #64748b; font-size: 0.95rem; margin-bottom: 2rem; border-left: 3px solid var(--primary); padding-left: 12px; }
+        .abstract { background: #eff6ff; border-left: 4px solid var(--primary); padding: 24px; margin: 24px 0; border-radius: 0 8px 8px 0; }
+        .abstract h3 { margin-top: 0; color: #1e40af; font-size: 1.1rem; }
+        table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 0.95rem; }
+        th, td { padding: 12px 16px; border: 1px solid var(--border); text-align: left; }
+        th { background: #f1f5f9; color: #334155; font-weight: 600; }
+        code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 0.88em; color: #0f172a; }
+        a { color: var(--primary); text-decoration: none; font-weight: 500; }
         a:hover { text-decoration: underline; }
         ul, ol { padding-left: 20px; }
-        .badge { display: inline-block; background: #dbeafe; color: #1e40af; padding: 3px 8px; border-radius: 4px; font-weight: 600; font-size: 0.85em; }
+        li { margin-bottom: 8px; }
+        .badge { display: inline-block; background: #dbeafe; color: #1e40af; padding: 2px 8px; border-radius: 4px; font-weight: 600; font-size: 0.82em; }
+        .badge-danger { background: #fee2e2; color: #991b1b; }
+        .chart-container { text-align: center; margin: 24px 0; background: #f8fafc; padding: 16px; border: 1px solid var(--border); border-radius: 8px; }
+        .chart-container img { max-width: 100%; height: auto; border-radius: 4px; }
+        .chart-caption { font-size: 0.85rem; color: #64748b; margin-top: 8px; }
     </style>
 </head>
 <body>
@@ -54,31 +61,31 @@
 
     <div class="abstract">
         <h3>Abstract</h3>
-        <p>Search engine optimization teams face operational challenges in identifying high-potential webpages to re-optimize across large content catalogs. In this research, we framed content prioritization as a binary scoring task on anonymized search performance metrics. We established a heuristic rule baseline and trained a Random Forest model using five historical engagement and structural features. Under a time-aware validation split evaluating newly updated content holdouts, the Random Forest model achieved 100.0% Precision@50, outperforming the baseline rule's 90.0% score. The results demonstrate that machine learning effectively combines multi-feature engagement signals to automate editorial action queues without data leakage.</p>
+        <p>How can search marketing teams automatically identify underperforming webpages on Page 1 rankings to maximize click recovery? We framed content re-optimization as a binary scoring task on 30,000 anonymized page records using a target proxy based on 90-day impressions and Click-Through Rate (CTR). We trained a constrained Random Forest model (max_depth=5) using five historical engagement and structural features and audited it against a heuristic baseline rule. Evaluated on a chronological time-aware test holdout, the Random Forest model achieved 100.0% Precision@50, outperforming the baseline rule's 90.0% precision score. The findings confirm that multi-feature machine learning effectively automates editorial priority queues without data leakage.</p>
     </div>
 
     <h2>1. Introduction & Problem Statement</h2>
-    <p>Content marketing and SEO teams operating across large domains must decide which existing webpages require editorial intervention. Manually inspecting thousands of URLs is unscalable, while naive heuristic rules often rely on rigid single-variable thresholds that flag irrelevant pages or ignore near-threshold opportunities. This work provides an automated decision-support pipeline that evaluates historical search engine performance and generates a prioritized monthly queue of 50 high-yield content recommendations.</p>
+    <p>Content teams operating at scale face significant operational bottlenecks when deciding which existing webpages to rewrite or re-optimize each month. Manual inspection is infeasible across large URL inventories, while rigid single-variable heuristic rules create sharp cutoffs that miss near-threshold opportunities. This work delivers an automated decision-support framework that evaluates historical Search Console performance to prioritize a monthly queue of 50 high-yield content re-optimization candidates.</p>
 
     <h2>2. Data Summary</h2>
-    <p>This study utilizes anonymized search performance records from the FlyRank search warehouse (30,000 unique page entries).</p>
+    <p>This study utilizes anonymized search performance records drawn from the FlyRank search performance warehouse (30,000 unique page records from the March 2026 snapshot slice).</p>
     <ul>
         <li><strong>Unit of Analysis:</strong> One row represents one unique published webpage URL.</li>
-        <li><strong>Data Window:</strong> Evaluated on a mid-panel aggregate snapshot (March 2026 slice).</li>
-        <li><strong>Excluded Variables:</strong> All post-decision metrics (including <code>future_clicks</code> and post-update engagement metrics) were excluded to prevent temporal data leakage.</li>
+        <li><strong>Evaluated Window:</strong> Mid-panel aggregate snapshot (March 2026 slice).</li>
+        <li><strong>Excluded Variables:</strong> Post-decision metrics (such as <code>future_clicks</code> and <code>future_impressions</code>) were strictly excluded to prevent temporal data leakage.</li>
     </ul>
 
     <h2>3. Methodology & Validation Design</h2>
-    <p>We defined a proxy target label, <code>target</code>, set to <code>1</code> if a page recorded <code>impressions_90d >= 100</code> and <code>ctr >= 0.05</code>, and <code>0</code> otherwise. Performance was measured using <strong>Precision@50</strong>, evaluating the proportion of true high-value targets captured within the model's top 50 recommendations.</p>
+    <p>We defined a binary proxy target label, <code>target</code>, set to <code>1</code> if a page recorded <code>impressions_90d >= 100</code> and <code>ctr >= 0.05</code>, and <code>0</code> otherwise. Model performance was measured using <strong>Precision@50</strong>, evaluating the proportion of true high-value targets captured within the model's top 50 recommendations.</p>
     <ul>
-        <li><strong>Baseline Heuristic Rule (Week 4):</strong> A score prioritizing pages based on SERP position, total impression volume, and content staleness.</li>
-        <li><strong>Machine Learning Model (Week 5):</strong> A Random Forest Classifier constrained to <code>max_depth=5</code> to prevent overfitting while allowing non-linear feature interaction learning.</li>
-        <li><strong>Honest Time-Aware Split (Week 6 Audit):</strong> The dataset was sorted chronologically by content recency (<code>days_since_last_update</code>), training on the oldest 70% of content and evaluating strictly on the held-out 30% newest content.</li>
-        <li><strong>Leakage Audit:</strong> Confirmed zero post-decision signals or label-derived columns were present in the feature set.</li>
+        <li><strong>Baseline Heuristic Rule (Week 4):</strong> A weighted score prioritizing pages based on SERP position, total impression volume, and content age.</li>
+        <li><strong>Machine Learning Model (Week 5):</strong> A Random Forest Classifier constrained to <code>max_depth=5</code> to prevent overfitting and ensure feature interpretability.</li>
+        <li><strong>Honest Time-Aware Split (Week 6 Audit):</strong> The dataset was sorted chronologically by content age (<code>days_since_last_update</code>), training on the oldest 70% of content (21,000 rows) and evaluating strictly on the held-out 30% newest content (9,000 rows).</li>
+        <li><strong>Leakage Audit:</strong> Confirmed zero post-decision signals or label-derived columns were present in the input feature vector.</li>
     </ul>
 
-    <h2>4. Results</h2>
-    <p>Model performance was evaluated on the held-out 30% time-aware test set against the heuristic baseline:</p>
+    <h2>4. Results & Feature Importance</h2>
+    <p>Model performance was evaluated on the 30% time-aware test set against the Week 4 heuristic baseline:</p>
     <table>
         <thead>
             <tr>
@@ -103,32 +110,51 @@
             </tr>
         </tbody>
     </table>
-    <p>Feature importance evaluation indicated that <code>ctr</code> (70.2%) and <code>impressions_90d</code> (26.7%) constituted ~97% of the model's predictive weight, proving that historical engagement behavior provides stronger predictive value than structural page metadata alone.</p>
+
+    <p>Feature importance evaluation confirmed that search engagement signals overwhelmingly drive predictive power compared to page structural metadata:</p>
+    <ul>
+        <li><code>ctr</code> (70.2% importance): Primary driver for identifying underperforming click capture.</li>
+        <li><code>impressions_90d</code> (26.7% importance): Secondary driver ensuring adequate search demand.</li>
+        <li><code>avg_position</code> (2.3% importance): Tertiary driver filtering SERP visibility.</li>
+        <li><code>word_count</code> (0.4%) & <code>days_since_last_update</code> (0.4%): Low direct weight.</li>
+    </ul>
+
+    <div class="chart-container">
+        <img src="work/figures/action_distribution.png" alt="Action Playbook Recommendation Distribution">
+        <div class="chart-caption">Figure 1: Distribution of generated action recommendations exported from notebook w07_action_playbook.ipynb.</div>
+    </div>
 
     <h2>5. Limitations & Honest Framing</h2>
     <ul>
-        <li><strong>Directional Decision Support:</strong> Predictions reflect historical statistical associations rather than guaranteed causal ranking updates by search algorithms.</li>
-        <li><strong>Snapshot Aggregation:</strong> Metrics represent 90-day aggregate performance and do not capture daily real-time SERP fluctuations.</li>
+        <li><strong>Directional Decision Support:</strong> Predictions reflect historical statistical associations rather than guaranteed causal ranking updates by Google algorithms.</li>
+        <li><strong>Snapshot Aggregation:</strong> Metrics represent 90-day aggregate performance and do not capture daily real-time search volume spikes or seasonality.</li>
         <li><strong>Cold-Start Indexing:</strong> Pages updated within the last 14 days exhibit erratic CTR behavior while search engines index them, requiring human review filtering.</li>
     </ul>
 
-    <h2>6. Content Action Playbook</h2>
-    <p>Model outputs are transformed into human-interpretable action labels paired with explicit reason codes:</p>
+    <h2>6. Content Action Playbook & No-Go Rules</h2>
+    <p>Model outputs are converted into human-interpretable action labels paired with explicit reason codes:</p>
     <ol>
-        <li><span class="badge">OPTIMIZE_TITLE</span> <strong>Reason Code: <code>HIGH_RANK_LOW_CTR</code></strong> — Triggered for top 10 SERP pages with CTR under 2.0%. Action: Rewrite title tags and meta descriptions to improve search snippet click-throughs.</li>
-        <li><span class="badge">REFRESH_CONTENT</span> <strong>Reason Code: <code>STALE_HIGH_TRAFFIC</code></strong> — Triggered for pages older than 180 days with over 100 impressions. Action: Update outdated facts, statistics, and broken media.</li>
-        <li><strong>Human Review Protocol & No-Go List:</strong> Automated CMS updates are strictly prohibited. Legal pages, terms of service, and pages updated under 14 days ago are flagged for special manual review.</li>
+        <li><span class="badge">OPTIMIZE_TITLE</span> <strong>Reason Code: <code>HIGH_RANK_LOW_CTR</code></strong> — Applied to Page 1 rankings (<code>avg_position <= 10</code>) with CTR under 2.0%. Action: Rewrite title tags and meta descriptions to improve search snippet click capture.</li>
+        <li><span class="badge">REFRESH_CONTENT</span> <strong>Reason Code: <code>STALE_HIGH_TRAFFIC</code></strong> — Applied to pages older than 180 days with over 100 impressions. Action: Update outdated facts, statistics, and broken media.</li>
+        <li><span class="badge" style="background:#e2e8f0; color:#475569;">MONITOR_AND_MAINTAIN</span> <strong>Reason Code: <code>STABLE_PERFORMANCE</code></strong> — Applied to stable pages.</li>
     </ol>
 
-    <h2>7. Reproducibility</h2>
-    <p>The complete experimental workflow is fully reproducible via the executed Jupyter notebooks in our public GitHub repository:</p>
+    <p><strong>Human Review Protocol & No-Go List:</strong> Direct CMS auto-publishing is strictly prohibited. The following cases are automatically flagged for special manual editor review:</p>
     <ul>
-        <li><a href="https://github.com/ZeroTechno/Machine-Learning-Intern/blob/main/work/notebooks/w02_ml_task_framing.ipynb" target="_blank">w02_ml_task_framing.ipynb (Task Framing)</a></li>
-        <li><a href="https://github.com/ZeroTechno/Machine-Learning-Intern/blob/main/work/notebooks/w03_data_contract.ipynb" target="_blank">w03_data_contract.ipynb (Data Contract)</a></li>
-        <li><a href="https://github.com/ZeroTechno/Machine-Learning-Intern/blob/main/work/notebooks/w04_baseline_score.ipynb" target="_blank">w04_baseline_score.ipynb (Baseline Score)</a></li>
-        <li><a href="https://github.com/ZeroTechno/Machine-Learning-Intern/blob/main/work/notebooks/w05_model.ipynb" target="_blank">w05_model.ipynb (ML Model)</a></li>
-        <li><a href="https://github.com/ZeroTechno/Machine-Learning-Intern/blob/main/work/notebooks/w06_validation_audit.ipynb" target="_blank">w06_validation_audit.ipynb (Validation Audit)</a></li>
-        <li><a href="https://github.com/ZeroTechno/Machine-Learning-Intern/blob/main/work/notebooks/w07_action_playbook.ipynb" target="_blank">w07_action_playbook.ipynb (Action Playbook)</a></li>
+        <li><span class="badge badge-danger">NO-GO</span> <strong>Premature Pages:</strong> Pages updated under 14 days ago (<code>days_since_last_update < 14</code>).</li>
+        <li><span class="badge badge-danger">NO-GO</span> <strong>Legal & Compliance Pages:</strong> Privacy policy, terms of service, or disclaimers.</li>
+        <li><span class="badge badge-danger">NO-GO</span> <strong>Expired Seasonal Campaigns:</strong> Holiday or event landing pages with natural off-season traffic drops.</li>
+    </ul>
+
+    <h2>7. Reproducibility & Notebook Artifacts</h2>
+    <p>The complete experimental pipeline is fully reproducible via the executed Jupyter notebooks in our public repository:</p>
+    <ul>
+        <li><a href="https://github.com/ZeroTechno/Machine-Learning-Intern/blob/main/work/notebooks/w02_ml_task_framing.ipynb" target="_blank">w02_ml_task_framing.ipynb — Task Framing & Metric Definition</a></li>
+        <li><a href="https://github.com/ZeroTechno/Machine-Learning-Intern/blob/main/work/notebooks/w03_data_contract.ipynb" target="_blank">w03_data_contract.ipynb — Data Contract & Leakage Trap</a></li>
+        <li><a href="https://github.com/ZeroTechno/Machine-Learning-Intern/blob/main/work/notebooks/w04_baseline_score.ipynb" target="_blank">w04_baseline_score.ipynb — Signal Audit & Baseline Rule Scoring</a></li>
+        <li><a href="https://github.com/ZeroTechno/Machine-Learning-Intern/blob/main/work/notebooks/w05_model.ipynb" target="_blank">w05_model.ipynb — Random Forest Classifier Training</a></li>
+        <li><a href="https://github.com/ZeroTechno/Machine-Learning-Intern/blob/main/work/notebooks/w06_validation_audit.ipynb" target="_blank">w06_validation_audit.ipynb — Time-Aware Validation Audit</a></li>
+        <li><a href="https://github.com/ZeroTechno/Machine-Learning-Intern/blob/main/work/notebooks/w07_action_playbook.ipynb" target="_blank">w07_action_playbook.ipynb — Action Playbook & Artifact Exports</a></li>
     </ul>
 
     <h2>8. Acknowledgments & Data Credit</h2>

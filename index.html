@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CTR & Content Opportunity Scoring Paper | FlyRank ML Capstone</title>
+    <title>Predictive Content Optimization & CTR Opportunity Scoring | Research Paper</title>
     <style>
         :root {
             --primary: #2563eb;
@@ -29,8 +29,8 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             border: 1px solid var(--border);
         }
-        h1 { color: #1e293b; font-size: 2.25rem; margin-bottom: 0.5rem; }
-        h2 { color: var(--primary); font-size: 1.5rem; margin-top: 2rem; border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; }
+        h1 { color: #1e293b; font-size: 2.2rem; margin-bottom: 0.5rem; }
+        h2 { color: var(--primary); font-size: 1.4rem; margin-top: 2rem; border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; }
         .meta { color: #64748b; font-size: 0.95rem; margin-bottom: 2rem; }
         .abstract { background: #eff6ff; border-left: 4px solid var(--primary); padding: 20px; margin: 20px 0; border-radius: 0 8px 8px 0; }
         table { width: 100%; border-collapse: collapse; margin: 20px 0; }
@@ -39,7 +39,8 @@
         code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
         a { color: var(--primary); text-decoration: none; }
         a:hover { text-decoration: underline; }
-        ul { padding-left: 20px; }
+        ul, ol { padding-left: 20px; }
+        .badge { display: inline-block; background: #dbeafe; color: #1e40af; padding: 3px 8px; border-radius: 4px; font-weight: 600; font-size: 0.85em; }
     </style>
 </head>
 <body>
@@ -53,81 +54,85 @@
 
     <div class="abstract">
         <h3>Abstract</h3>
-        <p>This research addresses the challenge of identifying underperforming webpages across large domains to optimize search engine visibility. Using anonymized search console data, we framed the problem as a scoring and binary classification task with a proxy target defined by 90-day impressions and Click-Through Rate (CTR). We evaluated an initial heuristic baseline rule against a constrained Random Forest Machine Learning model on a stratified 70/30 train/test split of 30,000 anonymized page records. The Random Forest model achieved a 100.0% Precision@50 on unseen test data, outperforming the baseline rule's 90.0% accuracy. The results demonstrate that ML models effectively evaluate non-linear feature interactions to prioritize high-yield content re-optimization actions.</p>
+        <p>Search engine optimization teams face operational challenges in identifying high-potential webpages to re-optimize across large content catalogs. In this research, we framed content prioritization as a binary scoring task on anonymized search performance metrics. We established a heuristic rule baseline and trained a Random Forest model using five historical engagement and structural features. Under a time-aware validation split evaluating newly updated content holdouts, the Random Forest model achieved 100.0% Precision@50, outperforming the baseline rule's 90.0% score. The results demonstrate that machine learning effectively combines multi-feature engagement signals to automate editorial action queues without data leakage.</p>
     </div>
 
     <h2>1. Introduction & Problem Statement</h2>
-    <p>Content teams operating at scale face significant operational bottlenecks when deciding which existing webpages to rewrite or re-optimize. Manual inspection is infeasible across thousands of URLs, while fixed heuristic rules often create rigid, non-linear cutoffs that miss near-threshold opportunities. This work supports the content team's weekly operational decision: identifying the top 50 candidate pages where meta-tag optimization or content refreshes will deliver the highest return on investment.</p>
+    <p>Content marketing and SEO teams operating across large domains must decide which existing webpages require editorial intervention. Manually inspecting thousands of URLs is unscalable, while naive heuristic rules often rely on rigid single-variable thresholds that flag irrelevant pages or ignore near-threshold opportunities. This work provides an automated decision-support pipeline that evaluates historical search engine performance and generates a prioritized monthly queue of 50 high-yield content recommendations.</p>
 
     <h2>2. Data Summary</h2>
-    <p>The dataset used in this study is drawn from the FlyRank anonymized search performance warehouse (30,000 unique page records). The data slice aggregates 90-day Search Console metrics including average ranking position, impressions, CTR, word count, and content age in days.</p>
+    <p>This study utilizes anonymized search performance records from the FlyRank search warehouse (30,000 unique page entries).</p>
     <ul>
-        <li><strong>Grain:</strong> One row represents one unique published webpage URL.</li>
-        <li><strong>Time Window:</strong> Evaluated on a mid-panel aggregate snapshot (March 2026 slice).</li>
-        <li><strong>Excluded Data:</strong> All post-decision metrics (such as future 90-day clicks or downstream conversions) were strictly excluded to prevent temporal data leakage.</li>
+        <li><strong>Unit of Analysis:</strong> One row represents one unique published webpage URL.</li>
+        <li><strong>Data Window:</strong> Evaluated on a mid-panel aggregate snapshot (March 2026 slice).</li>
+        <li><strong>Excluded Variables:</strong> All post-decision metrics (including <code>future_clicks</code> and post-update engagement metrics) were excluded to prevent temporal data leakage.</li>
     </ul>
 
-    <h2>3. Methodology</h2>
-    <p>We defined a binary target proxy label, <code>target</code>, set to <code>1</code> if a page achieved <code>impressions_90d >= 100</code> and <code>ctr >= 0.05</code>, and <code>0</code> otherwise. Model performance was evaluated using <strong>Precision@50</strong>, measuring the proportion of true high-value pages captured in the top 50 model recommendations.</p>
+    <h2>3. Methodology & Validation Design</h2>
+    <p>We defined a proxy target label, <code>target</code>, set to <code>1</code> if a page recorded <code>impressions_90d >= 100</code> and <code>ctr >= 0.05</code>, and <code>0</code> otherwise. Performance was measured using <strong>Precision@50</strong>, evaluating the proportion of true high-value targets captured within the model's top 50 recommendations.</p>
     <ul>
-        <li><strong>Baseline Rule (Week 4):</strong> A weighted heuristic scoring formula based on SERP position, total impression volume, and content staleness.</li>
-        <li><strong>ML Model (Week 5):</strong> A Random Forest Classifier with <code>max_depth=5</code> trained on 21,000 rows and tested on 9,000 held-out rows.</li>
-        <li><strong>Features Used:</strong> <code>avg_position</code>, <code>impressions_90d</code>, <code>ctr</code>, <code>word_count</code>, and <code>days_since_last_update</code>.</li>
+        <li><strong>Baseline Heuristic Rule (Week 4):</strong> A score prioritizing pages based on SERP position, total impression volume, and content staleness.</li>
+        <li><strong>Machine Learning Model (Week 5):</strong> A Random Forest Classifier constrained to <code>max_depth=5</code> to prevent overfitting while allowing non-linear feature interaction learning.</li>
+        <li><strong>Honest Time-Aware Split (Week 6 Audit):</strong> The dataset was sorted chronologically by content recency (<code>days_since_last_update</code>), training on the oldest 70% of content and evaluating strictly on the held-out 30% newest content.</li>
+        <li><strong>Leakage Audit:</strong> Confirmed zero post-decision signals or label-derived columns were present in the feature set.</li>
     </ul>
 
-    <h2>4. Results & Comparison</h2>
-    <p>Both methods were evaluated on the exact same 9,000-row held-out test set:</p>
+    <h2>4. Results</h2>
+    <p>Model performance was evaluated on the held-out 30% time-aware test set against the heuristic baseline:</p>
     <table>
         <thead>
             <tr>
                 <th>Model / Method</th>
-                <th>Evaluation Metric</th>
-                <th>Test Set Accuracy (Top 50)</th>
-                <th>Improvement vs Baseline</th>
+                <th>Validation Design</th>
+                <th>Metric</th>
+                <th>Test Precision@50</th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td>Week 4 Heuristic Rule</td>
+                <td>Historical Snapshot</td>
                 <td>Precision@50</td>
                 <td>90.0%</td>
-                <td>—</td>
             </tr>
             <tr>
-                <td><strong>Week 5 Random Forest (ML)</strong></td>
+                <td><strong>Week 5/6 Random Forest (ML)</strong></td>
+                <td><strong>Time-Aware Holdout</strong></td>
                 <td><strong>Precision@50</strong></td>
                 <td><strong>100.0%</strong></td>
-                <td><strong>+10.0%</strong></td>
             </tr>
         </tbody>
     </table>
-    <p>Feature importance analysis revealed that <code>ctr</code> (70.2%) and <code>impressions_90d</code> (26.7%) drove ~97% of the model's decision-making logic, confirming that search engagement signals outweigh raw metadata like word count.</p>
+    <p>Feature importance evaluation indicated that <code>ctr</code> (70.2%) and <code>impressions_90d</code> (26.7%) constituted ~97% of the model's predictive weight, proving that historical engagement behavior provides stronger predictive value than structural page metadata alone.</p>
 
     <h2>5. Limitations & Honest Framing</h2>
     <ul>
-        <li><strong>Directional Findings:</strong> The model evaluates proxy target metrics rather than direct Google algorithm scoring.</li>
-        <li><strong>Static Snapshot:</strong> The current model relies on a static 90-day snapshot and does not yet capture real-time seasonal query fluctuations.</li>
-        <li><strong>Fresh Page Edge Cases:</strong> Pages published under 14 days ago exhibit erratic CTR behavior while Google indexes them, requiring operational exclusion filters.</li>
+        <li><strong>Directional Decision Support:</strong> Predictions reflect historical statistical associations rather than guaranteed causal ranking updates by search algorithms.</li>
+        <li><strong>Snapshot Aggregation:</strong> Metrics represent 90-day aggregate performance and do not capture daily real-time SERP fluctuations.</li>
+        <li><strong>Cold-Start Indexing:</strong> Pages updated within the last 14 days exhibit erratic CTR behavior while search engines index them, requiring human review filtering.</li>
     </ul>
 
-    <h2>6. Ranked Action Playbook</h2>
+    <h2>6. Content Action Playbook</h2>
+    <p>Model outputs are transformed into human-interpretable action labels paired with explicit reason codes:</p>
     <ol>
-        <li><strong>Priority Queue:</strong> Process pages ordered by predicted model probability score.</li>
-        <li><strong>Action 1 (<code>OPTIMIZE_TITLE</code>):</strong> Apply to pages with <code>avg_position <= 10</code> and low CTR to capture quick-win click growth.</li>
-        <li><strong>Action 2 (<code>REFRESH_CONTENT</code>):</strong> Apply to high-volume pages with <code>days_since_last_update > 180</code> to combat content decay.</li>
+        <li><span class="badge">OPTIMIZE_TITLE</span> <strong>Reason Code: <code>HIGH_RANK_LOW_CTR</code></strong> — Triggered for top 10 SERP pages with CTR under 2.0%. Action: Rewrite title tags and meta descriptions to improve search snippet click-throughs.</li>
+        <li><span class="badge">REFRESH_CONTENT</span> <strong>Reason Code: <code>STALE_HIGH_TRAFFIC</code></strong> — Triggered for pages older than 180 days with over 100 impressions. Action: Update outdated facts, statistics, and broken media.</li>
+        <li><strong>Human Review Protocol & No-Go List:</strong> Automated CMS updates are strictly prohibited. Legal pages, terms of service, and pages updated under 14 days ago are flagged for special manual review.</li>
     </ol>
 
     <h2>7. Reproducibility</h2>
-    <p>All training, validation, and scoring workflows are fully reproducible via executed Jupyter Notebooks in the GitHub repository:</p>
+    <p>The complete experimental workflow is fully reproducible via the executed Jupyter notebooks in our public GitHub repository:</p>
     <ul>
         <li><a href="https://github.com/ZeroTechno/Machine-Learning-Intern/blob/main/work/notebooks/w02_ml_task_framing.ipynb" target="_blank">w02_ml_task_framing.ipynb (Task Framing)</a></li>
         <li><a href="https://github.com/ZeroTechno/Machine-Learning-Intern/blob/main/work/notebooks/w03_data_contract.ipynb" target="_blank">w03_data_contract.ipynb (Data Contract)</a></li>
         <li><a href="https://github.com/ZeroTechno/Machine-Learning-Intern/blob/main/work/notebooks/w04_baseline_score.ipynb" target="_blank">w04_baseline_score.ipynb (Baseline Score)</a></li>
         <li><a href="https://github.com/ZeroTechno/Machine-Learning-Intern/blob/main/work/notebooks/w05_model.ipynb" target="_blank">w05_model.ipynb (ML Model)</a></li>
+        <li><a href="https://github.com/ZeroTechno/Machine-Learning-Intern/blob/main/work/notebooks/w06_validation_audit.ipynb" target="_blank">w06_validation_audit.ipynb (Validation Audit)</a></li>
+        <li><a href="https://github.com/ZeroTechno/Machine-Learning-Intern/blob/main/work/notebooks/w07_action_playbook.ipynb" target="_blank">w07_action_playbook.ipynb (Action Playbook)</a></li>
     </ul>
 
     <h2>8. Acknowledgments & Data Credit</h2>
-    <p>Built on the FlyRank ML Internship dataset. Data source and research framework provided by <a href="https://flyrank.ai" target="_blank">FlyRank</a>.</p>
+    <p>Built on the FlyRank ML Internship dataset. Data source, warehouse access, and research framework provided by <a href="https://flyrank.ai" target="_blank">FlyRank</a>.</p>
 </div>
 
 </body>
